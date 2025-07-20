@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { Firestore } from '@google-cloud/firestore'; // o de 'firebase-admin/firestore' si usas firebase-admin
+import { Firestore } from '@google-cloud/firestore';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 
@@ -7,7 +7,7 @@ import { UpdateCourseDto } from './dto/update-course.dto';
 @Injectable()
 export class CoursesService {
 
-   private collection: FirebaseFirestore.CollectionReference;
+  private collection: FirebaseFirestore.CollectionReference;
 
   constructor(@Inject('FIRESTORE') private readonly firestore: Firestore) {
     this.collection = this.firestore.collection('courses');
