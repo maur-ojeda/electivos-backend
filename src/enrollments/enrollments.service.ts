@@ -15,6 +15,7 @@ export class EnrollmentsService {
     try {
       const docRef = await this.collection.add({
         ...dto,
+        status: dto.status ?? true, // si no se envía, será true (inscripción activa)
         createdAt: new Date(),
       });
       return { id: docRef.id };
@@ -46,4 +47,23 @@ export class EnrollmentsService {
     await this.collection.doc(id).delete();
     return { id };
   }
+
+  async findActives() {
+    const snapshot = await this.collection.where('status', '==', true).get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
+
+  async deactivate(id: string) {
+    const docRef = this.collection.doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) throw new NotFoundException(`Document with id ${id} not found`);
+    await docRef.update({ status: false });
+    return { id, status: false };
+  }
+
+  async findByStudent(studentId: string) {
+    const snapshot = await this.collection.where('studentId', '==', studentId).get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
+
 }

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsDate, IsBoolean } from 'class-validator';  
+import { IsString, IsNotEmpty, IsOptional, IsDate, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateEnrollmentDto {
@@ -14,9 +14,10 @@ export class CreateEnrollmentDto {
     @IsString()
     additionalInfo?: string;
 
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    createdAt: Date;
+    createdAt?: Date
 
     @IsOptional()
     @IsBoolean()
