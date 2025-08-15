@@ -1,5 +1,7 @@
 # electivos-backend
+
 electivos-backend
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
@@ -98,3 +100,152 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+# Documentación de Entidades - Sistema de Gestión de Cursos Electivos
+
+Este documento describe las entidades principales del sistema, sus campos, tipos de datos y relaciones.
+
+---
+
+## 1. **Student**
+
+Representa a un estudiante del colegio.
+
+| Campo     | Tipo   | Descripción                        |
+| --------- | ------ | ---------------------------------- |
+| id        | string | Identificador único del estudiante |
+| name      | string | Nombre completo                    |
+| level     | string | Nivel o curso al que pertenece     |
+| email     | string | Correo electrónico                 |
+| createdAt | Date   | Fecha de creación                  |
+| updatedAt | Date   | Fecha de última actualización      |
+
+---
+
+## 2. **Teacher**
+
+Representa a un profesor.
+
+| Campo     | Tipo   | Descripción                      |
+| --------- | ------ | -------------------------------- |
+| id        | string | Identificador único del profesor |
+| name      | string | Nombre completo                  |
+| email     | string | Correo electrónico               |
+| createdAt | Date   | Fecha de creación                |
+| updatedAt | Date   | Fecha de última actualización    |
+
+---
+
+## 3. **Course**
+
+Representa un curso electivo.
+
+| Campo             | Tipo    | Descripción                              |
+| ----------------- | ------- | ---------------------------------------- |
+| id                | string  | Identificador único del curso            |
+| name              | string  | Nombre del curso                         |
+| description       | string  | Descripción del curso                    |
+| capacity          | number  | Cupo máximo del curso                    |
+| currentEnrollment | number  | Número actual de estudiantes inscritos   |
+| periodId          | string  | ID del período al que pertenece el curso |
+| teacherId         | string  | ID del profesor asignado                 |
+| teacherName       | string  | Nombre del profesor asignado             |
+| isActive          | boolean | Indica si el curso está activo           |
+| createdAt         | Date    | Fecha de creación                        |
+| updatedAt         | Date    | Fecha de última actualización            |
+
+**Relaciones:**
+
+- Pertenece a un período (`Period`)
+- Relacionado con estudiantes mediante `StudentCourse`
+- Puede tener asistencia registrada en `Attendance`
+
+---
+
+## 4. **Period**
+
+Representa un período de inscripción o académico.
+
+| Campo     | Tipo    | Descripción                      |
+| --------- | ------- | -------------------------------- |
+| id        | string  | Identificador único del período  |
+| name      | string  | Nombre del período               |
+| startDate | Date    | Fecha de inicio                  |
+| endDate   | Date    | Fecha de término                 |
+| isActive  | boolean | Indica si el período está activo |
+| createdAt | Date    | Fecha de creación                |
+| updatedAt | Date    | Fecha de última actualización    |
+
+**Relaciones:**
+
+- Cursos (`Course`) pertenecen a un período
+- Inscripciones y asistencia están vinculadas al período
+
+---
+
+## 5. **StudentCourse**
+
+Entidad intermedia que vincula estudiantes con cursos.
+
+| Campo     | Tipo   | Descripción                   |
+| --------- | ------ | ----------------------------- |
+| id        | string | Identificador único           |
+| studentId | string | ID del estudiante             |
+| courseId  | string | ID del curso                  |
+| periodId  | string | ID del período                |
+| createdAt | Date   | Fecha de creación             |
+| updatedAt | Date   | Fecha de última actualización |
+
+**Relaciones:**
+
+- Many-to-Many entre `Student` y `Course`
+- Permite controlar solapamiento de horarios y máximo de cursos
+
+---
+
+## 6. **Enrollment**
+
+Registro de intentos de inscripción y estados (pendiente, aprobado, rechazado).
+
+| Campo     | Tipo   | Descripción                                                |
+| --------- | ------ | ---------------------------------------------------------- |
+| id        | string | Identificador único                                        |
+| studentId | string | ID del estudiante                                          |
+| courseId  | string | ID del curso                                               |
+| periodId  | string | ID del período                                             |
+| status    | string | Estado de la inscripción (`pending / approved / rejected`) |
+| createdAt | Date   | Fecha de creación                                          |
+| updatedAt | Date   | Fecha de última actualización                              |
+
+---
+
+## 7. **Attendance**
+
+Registra la asistencia de estudiantes y profesores por sesión de curso.
+
+| Campo             | Tipo    | Descripción                                                |
+| ----------------- | ------- | ---------------------------------------------------------- |
+| id                | string  | Identificador único                                        |
+| courseId          | string  | ID del curso                                               |
+| periodId          | string  | ID del período                                             |
+| date              | Date    | Fecha de la sesión                                         |
+| teacherPresent    | boolean | Indica si el profesor asistió                              |
+| studentAttendance | array   | Array de objetos `{ studentId: string; present: boolean }` |
+| notes             | string  | Observaciones adicionales                                  |
+| createdAt         | Date    | Fecha de creación                                          |
+| updatedAt         | Date    | Fecha de última actualización                              |
+
+**Relaciones:**
+
+- Vinculada a `Course`, `Period`, `Student` y `Teacher`
+
+---
+
+## **Resumen de Relaciones Clave**
+
+- **Student ↔ Course** → `StudentCourse` (Many-to-Many)
+- **Course ↔ Period** → Cada curso pertenece a un período (Many-to-One)
+- **Attendance ↔ Course / Student / Teacher** → Registro de asistencia por sesión
+- **Enrollment ↔ Student / Course / Period** → Flujo de inscripción con estados
+
+---
